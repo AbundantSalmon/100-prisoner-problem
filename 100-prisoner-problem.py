@@ -3,7 +3,7 @@ from enum import Enum
 
 NUMBER_OF_PRISONERS = 100
 NUMBER_OF_BOXES_TO_CHECK = 50
-NUMBER_OF_ITERATIONS = 10000
+NUMBER_OF_ITERATIONS = 1000000
 
 
 class Strategy(Enum):
@@ -73,11 +73,10 @@ def efficient_strategy(boxes: list[int]) -> bool:
         if box_searched == prisoner:
             found_their_box = True
         boxes_searched = 1
-        while boxes_searched <= NUMBER_OF_BOXES_TO_CHECK:
+        while boxes_searched <= NUMBER_OF_BOXES_TO_CHECK and not found_their_box:
             box_searched = boxes[box_searched - 1]
             if box_searched == prisoner:
                 found_their_box = True
-                break
             boxes_searched += 1
         if not found_their_box:
             return False
