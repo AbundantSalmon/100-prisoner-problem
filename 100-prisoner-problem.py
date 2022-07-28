@@ -1,5 +1,7 @@
 import random
+import time
 from enum import Enum
+from multiprocessing import Pool, cpu_count
 
 NUMBER_OF_PRISONERS = 100
 NUMBER_OF_BOXES_TO_CHECK = 50
@@ -15,6 +17,20 @@ MODE = Strategy.EFFICIENT
 
 
 def main() -> None:
+    print("Parallel Run")
+    start_time = time.time()
+    parallel_run()
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time}s")
+
+    # print("Synchronous Run")
+    # start_time = time.time()
+    # synchronous_run()
+    # end_time = time.time()
+    # print(f"Time taken: {end_time - start_time}s")
+
+
+def synchronous_run() -> None:
     number_successful_iterations = 0
     print("Starting prisoner problem simulation...")
     for _ in range(NUMBER_OF_ITERATIONS):
@@ -35,6 +51,32 @@ def main() -> None:
     print(
         f"Probability of success: {number_successful_iterations / NUMBER_OF_ITERATIONS}"
     )
+
+
+def run_iteration(i: int) -> bool:
+    boxes = setup_random_boxes(NUMBER_OF_PRISONERS)
+    match MODE:
+        case Strategy.NAIVE:
+            return naive_strategy(boxes)
+        case Strategy.EFFICIENT:
+            return efficient_strategy(boxes)
+        case _:
+            raise ValueError("Invalid strategy")
+
+
+def parallel_run() -> None:
+    print(f"number of cores: {cpu_count()}")
+    with Pool() as pool:
+        print("Starting prisoner problem simulation...")
+        results = pool.map(run_iteration, range(NUMBER_OF_ITERATIONS))
+        number_successful_iterations = sum(results)
+
+        print("Simulation finished.")
+        print(f"Number of successful iterations: {number_successful_iterations}")
+        print(f"Number of iterations: {NUMBER_OF_ITERATIONS}")
+        print(
+            f"Probability of success: {number_successful_iterations / NUMBER_OF_ITERATIONS}"
+        )
 
 
 def setup_random_boxes(number_of_prisoners: int) -> list[int]:
